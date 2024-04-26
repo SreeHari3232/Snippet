@@ -6,6 +6,9 @@ from django.db.models import Count
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
@@ -37,6 +40,8 @@ class Snippets(viewsets.ModelViewSet):
     queryset = TextSnippet.objects.all()
     serializer_class = TextSnippetSerializer
     pagination_class = CustomPagination
+    permission_classes = [IsAuthenticated]
+
 
     def get_serializer_class(self):
         if self.action == 'create' or self.action == 'update':
@@ -54,3 +59,4 @@ class Snippets(viewsets.ModelViewSet):
 class Tags(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
+    permission_classes = [IsAuthenticated]
