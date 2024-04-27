@@ -42,19 +42,47 @@ class Snippets(viewsets.ModelViewSet):
     pagination_class = CustomPagination
     permission_classes = [IsAuthenticated]
 
-
-    def get_serializer_class(self):
-        if self.action == 'create' or self.action == 'update':
-            return BaseSnippetSerializer
-        return TextSnippetSerializer
-
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
     def perform_update(self, serializer):
         serializer.save(user=self.request.user)
 
-   
+    def create(self, request, *args, **kwargs):
+        tags_data = request.data.get('tags', None)
+        serializer = BaseSnippetSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        snippet = serializer.instance
+        if tags_data:
+            for tag_data in tags_data:
+                tag_title = tag_data.get('name')
+                tag, created = Tag.objects.get_or_create(name=tag_title)
+                if created:
+                    tag.save()
+                snippet.tags.add(tag)
+        return Response(serializer.data)
+    
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        tags_data = request.data.get('tags', None)
+        serializer = BaseSnippetSerializer(instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        snippet = serializer.instance
+        if tags_data:
+            snippet.tags.clear()
+            
+            for tag_data in tags_data:
+                tag_title = tag_data.get('name')
+                tag, created = Tag.objects.get_or_create(name=tag_title)
+                if created:
+                    tag.save()
+                snippet.tags.add(tag)
+
+        return Response(serializer.data)
 
 class Tags(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
