@@ -98,7 +98,7 @@ class Tags(viewsets.ModelViewSet):
         snippet_titles = [snippet['title'] for snippet in serializer.data]
         serialized_data = {
             "id": instance.id,
-            "name": instance.name,
-            "title": snippet_titles
+            "tag_name": instance.name,
+            "snippet_titles": snippet_titles
         }
         return Response(serialized_data)
