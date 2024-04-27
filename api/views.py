@@ -60,3 +60,17 @@ class Tags(viewsets.ModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
     permission_classes = [IsAuthenticated]
+
+
+    def retrieve(self, request, *args, **kwargs):
+
+        instance = self.get_object()
+        snippets = instance.textsnippet_set.all()
+        serializer = TextSnippetSerializer(snippets, many=True)
+        snippet_titles = [snippet['title'] for snippet in serializer.data]
+        serialized_data = {
+            "id": instance.id,
+            "name": instance.name,
+            "title": snippet_titles
+        }
+        return Response(serialized_data)
