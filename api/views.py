@@ -66,7 +66,6 @@ class Snippets(viewsets.ModelViewSet):
     
     def update(self, request, *args, **kwargs):
         instance = self.get_object()
-        print("\n"*9, "INSTANCE>>>", type(instance), "\n"*9)
         tags_data = request.data.get('tags', None)
         serializer = BaseSnippetSerializer(instance, data=request.data)
         serializer.is_valid(raise_exception=True)
